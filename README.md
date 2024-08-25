@@ -1,8 +1,8 @@
 # load-rest-api-v1
-REST API service for loading test
+REST API service for loading test (Spring Boot 3.3.3 Maven)
 
 ## Port
-Working on port 8000 
+Working on port 8000 `(src/main/resources/application.properties)`
 
 ## Endpoints
 ### GET
@@ -18,7 +18,16 @@ Response:
 }
 ```
 ### POST
-`127.0.0.1:8000?login=value1&password=value2`
+`127.0.0.1:8000`
+
+Request Body:
+
+```json
+{
+    "password": "value2",
+    "login": "value1"
+}
+```
 
 Response:
 
