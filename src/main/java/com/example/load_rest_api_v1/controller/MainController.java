@@ -1,20 +1,14 @@
 package com.example.load_rest_api_v1.controller;
 
+import com.example.load_rest_api_v1.model.User;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 
 /**
  * @author Valeev A.R.
@@ -23,73 +17,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 public class MainController {
 
-    private long setOffsetResponseTime(int min, int max ) throws InterruptedException {
+    private long setOffsetTime(int minOffsetTime, int maxOffsetTime) throws InterruptedException {
         long start = System.currentTimeMillis();
-        int offsetResponseTime = getRandomInt(min, max);
-        Thread.sleep(offsetResponseTime);
+        int randomTime = (int) ((Math.random() * (maxOffsetTime - minOffsetTime)) + minOffsetTime);
+        Thread.sleep(randomTime);
         return System.currentTimeMillis() - start;
     }
-    private int getRandomInt(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
+
+    @GetMapping(path="/")
+    @ResponseBody
+    public ResponseEntity getUser() throws InterruptedException {
+        long offsetTime = setOffsetTime(1000,2000);
+        /* Set header:
+         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+         map.add("Set-Cookie","jmeter=true"); - cookie
+         map.add("jmeter","true"); - header
+         new ResponseEntity(data, header, status); }
+        */
+        return new ResponseEntity(new User("static","Static"), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ResponseEntity<Map> handleGetUser() throws InterruptedException {
-        long offsetResponseTime = setOffsetResponseTime(1000, 2000);
-
-        String login = "Your login";
-        String password = "Your password";
-        String datetimeConnect = "Datetime connection";
-
-        Map data = new HashMap<>();
-
-        data.put("login", login);
-        data.put("password", password);
-        data.put("date", datetimeConnect);
-
-        /* Add offset response time */
-        //data.put("response time", offsetResponseTime);
-
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-
-        /* Set cookie */
-        //map.add("Set-Cookie","jmeter=true");
-
-        return new ResponseEntity<Map>(data, map, HttpStatus.OK);
+    @PostMapping(path="/class")
+    @ResponseBody
+    public ResponseEntity<?> postUser(@RequestBody @Valid User user) throws InterruptedException {
+        long offsetTime = setOffsetTime(1000,2000);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity<Map> handlePostUser(@RequestBody com.fasterxml.jackson.databind.JsonNode payload) throws InterruptedException {
-        long offsetResponseTime = setOffsetResponseTime(1000, 2000);
-        String login = null;
-        String password = null;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.readTree(payload.toString());
-            login = node.get("login").asText();
-            password = node.get("password").asText();
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        Date date = new Date();
-        String datetimeConnect = dateFormat.format(date);
-
-        Map data = new HashMap<>();
-
-        data.put("login", login);
-        data.put("password", password);
-        data.put("date", datetimeConnect);
-
-        /* Add offset response time */
-        //data.put("response time", offsetResponseTime);
-
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-
-        /* Set head */
-        //map.add("jmeter", "true");
-
-        return new ResponseEntity<Map>(data, map, HttpStatus.OK);
+    @PostMapping(path="/map")
+    @ResponseBody
+    public ResponseEntity<?> postUsers(@RequestBody Map<String, String> body) throws InterruptedException {
+        long offsetTime = setOffsetTime(1000,2000);
+        String login = body.get("login") == null ? null: body.get("login").toString();
+        String password = body.get("password") == null ? null: body.get("password").toString();
+        if (login != null && password != null && body.size() == 2)
+            if (!login.trim().isEmpty() && !password.trim().isEmpty())
+                return new ResponseEntity<>(new User(login, password), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
 }

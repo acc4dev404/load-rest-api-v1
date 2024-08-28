@@ -8,24 +8,68 @@ Working on port 8000
 ### GET
 `127.0.0.1:8000`
 
-Response:
+Response: `200`
 
 ```json
 {
-    "date": "Datetime connection",
-    "password": "Your password",
-    "login": "Your login"
+  "login": "static",
+  "password": "Static",
+  "date": "31.12.2024 23:59:59"
 }
 ```
 ### POST
-`127.0.0.1:8000?login=value1&password=value2`
+`127.0.0.1:8000/class` on base class User
 
-Response:
+Request:
+```json
+{
+  "login": "login",
+  "password": "password"
+}
+```
+
+Response: `200`
 
 ```json
 {
-    "date": "31.12.2024 23:59:59",
-    "password": "value2",
-    "login": "value1"
+  "login": "login",
+  "password": "password",
+  "date": "31.12.2024 23:59:59"
 }
+```
+
+Error: `400`
+
+```json
+{
+  "timestamp": "2024-12-31T23:59:59.999+00:00",
+  "status": 400,
+  "error": "Bad Request",
+  "path": "/class"
+}
+```
+
+`127.0.0.1:8000/map` on base Map<String, String>
+
+Request:
+```json
+{
+  "login": "login",
+  "password": "password"
+}
+```
+
+Response: `200`
+
+```json
+{
+  "login": "login",
+  "password": "password",
+  "date": "31.12.2024 23:59:59"
+}
+```
+
+Error: `400`
+
+```json
 ```
